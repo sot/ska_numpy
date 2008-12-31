@@ -199,12 +199,12 @@ def smooth(x,window_len=10,window='hanning'):
 def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=None):
     """Compress C{recarray} rows into intervals where adjacent rows are similar.
 
-    In addition to the original column names (except those specified in C{ignore}), the
-    output recarray will have these columns::
-      samples: number of samples in interval
+    In addition to the original column names, the output recarray will have
+    these columns::
       <indexcol>_start: start value of the C{indexcol} column.  
       <indexcol>_stop: stop value of the C{indexcol} column (inclusive
                        up to the next interval).
+      samples: number of samples in interval
     If C{indexcol} is None (default) then the table row index will be used and
     the output columns will be row_start and row_stop.
 
