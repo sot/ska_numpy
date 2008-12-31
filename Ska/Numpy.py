@@ -196,3 +196,121 @@ def smooth(x,window_len=10,window='hanning'):
     y=numpy.convolve(w/w.sum(),s,mode='same')
     return y[window_len-1:-window_len+1]
 
+def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=None):
+    """Compress C{recarray} rows into intervals where adjacent rows are similar.
+
+    In addition to the original column names (except those specified in C{ignore}), the
+    output recarray will have these columns::
+      samples: number of samples in interval
+      <indexcol>_start: start value of the C{indexcol} column.  
+      <indexcol>_stop: stop value of the C{indexcol} column (inclusive
+                       up to the next interval).
+    If C{indexcol} is None (default) then the table row index will be used and
+    the output columns will be row_start and row_stop.
+
+    C{delta} is a dict mapping column names to a delta value defining whether a
+    column is sufficiently different to break the interval.  These are used
+    when generating the default C{diff} functions for numerical columns
+    (i.e. those for which abs(x) succeeds).
+
+    C{diff} is a dict mapping column names to functions that take as input two
+    values and return a boolean indicating whether the values are sufficiently
+    different to break the interval.  Default diff functions will be generated
+    if C{diff} is None or for columns without an entry.
+
+    C{avg} is a dict mapping column names to functions that calculate the
+    average of a numpy array of values for that column.  Default avg functions
+    will be generated if C{avg} is None or for columns without an entry.
+
+    Example::
+      a = ((1, 2, 'hello', 2.),
+           (1, 4, 'hello', 3.),
+           (1, 2, 'hello', 4.),
+           (1, 2, 'hi there', 5.),
+           (1, 2, 'hello', 6.),
+           (3, 2, 'hello', 7.),
+           (1, 2, 'hello', 8.),
+           (2, 2, 'hello', 9.))
+      arec = numpy.rec.fromrecords(a, names=('col1','col2','greet','time'))
+      acomp = compress(arec, indexcol='time', delta={'col1':1.5})
+
+    @param delta: dict of delta thresholds defining when to break interval
+    @param indexcol: name of column to report start and stop values for interval.
+    @param diff: dict of functions defining the diff of 2 vals for that column name.
+    @param avg: dict of functions defining the average value for that column name.
+    @param colnames: list of column names to include (default = all).
+
+    @return: record array of compressed values
+    """
+
+    def _numdiff(colname):
+        d = delta.get(colname, 0)
+        def _diff(x, y):
+            return (False if d is None else numpy.abs(x-y) > d)
+        return _diff
+
+
+    if delta is None: delta = {}
+    if diff is None: diff = {}
+    if avg is None: avg = {}
+    if colnames is None: colnames = recarray.dtype.names
+
+    i0 = 0
+    mins = {}
+    maxs = {}
+    break_interval = False
+    end_of_data = False
+    intervals = []
+    nrec = len(recarray)
+
+    colnames = [x for x in colnames if x != indexcol]
+
+    # Set up the difference functions
+    row = recarray[0]
+    for colname in set(colnames) - set(diff):
+        try:
+            diff[colname] = _numdiff(colname)
+            diff[colname](row[colname], row[colname])
+        except TypeError:
+            diff[colname] = lambda x, y: x != y
+
+    # Set up averaging functions
+    for colname in set(colnames) - set(avg):
+        try:
+            avg[colname] = lambda x: x.mean().tolist()
+            avg[colname](row[colname])
+        except TypeError:
+            avg[colname] = lambda x: x[0].tolist()
+
+    for i in range(nrec+1):
+        if i < nrec:
+            row = recarray[i]
+            for colname in colnames:
+                # calc running min/max
+                val = row[colname]
+                if val < mins.setdefault(colname, val):
+                    mins[colname] = val
+                if val > maxs.setdefault(colname, val):
+                    maxs[colname] = val
+
+                if diff[colname](mins[colname], maxs[colname]):
+                    break_interval = True
+                    break
+        else:
+            break_interval = True
+
+        if break_interval:
+            i1 = i
+            vals = tuple(avg[x](recarray[x][i0:i1]) for x in colnames)
+            samples = (i1-i0, )
+            indexvals = (recarray[i0][indexcol], row[indexcol]) if indexcol else (i0, i1) 
+            intervals.append(indexvals + samples + vals)
+            i0 = i
+            mins = dict((x, row[x]) for x in colnames)
+            maxs = dict((x, row[x]) for x in colnames)
+            break_interval = False
+
+    if indexcol is None:
+        indexcol = 'row'
+    names = [indexcol+'_start', indexcol+'_stop', 'samples'] + colnames
+    return numpy.rec.fromrecords(intervals, names=names)
