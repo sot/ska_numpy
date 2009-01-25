@@ -4,16 +4,19 @@ import numpy
 import re
 import operator
 
+__docformat__ = "restructuredtext en"
+
 def add_column(recarray, name, val, index=None):
-    """Add a column C{name} with value C{val} to C{recarray} and return a new
+    """
+    Add a column ``name`` with value ``val`` to ``recarray`` and return a new
     record array.
 
-    @param recarray: Input record array
-    @param name: Name of the new column
-    @param val: Value of the new column (numpy.array or list)
-    @param index: Add column before index (default: append at end)
+    :param recarray: Input record array
+    :param name: Name of the new column
+    :param val: Value of the new column (numpy.array or list)
+    :param index: Add column before index (default: append at end)
 
-    @return: New record array with column appended
+    :rtype: New record array with column appended
     """
     if len(val) != len(recarray):
         raise ValueError('Length mismatch: recarray, val = (%d, %d)' % (len(recarray), len(val)))
@@ -34,21 +37,21 @@ def add_column(recarray, name, val, index=None):
     return numpy.rec.fromarrays(arrays, dtype=dtypes)
 
 def match(recarray, filters):
-    """Apply the list of C{filters} to the numpy record array C{recarray} and
+    """
+    Apply the list of ``filters`` to the numpy record array ``recarray`` and
     return the corresponding boolean mask array.
     
     Each filter is a string with a simple boolean comparison of the form::
 
       colname op value
 
-    where C{colname} is a column name in C{recarray}, C{op} is an operator
-    (e.g. == or < or >= etc), and C{value} is a value.  String values can
+    where ``colname`` is a column name in ``recarray``, ``op`` is an operator
+    (e.g. == or < or >= etc), and ``value`` is a value.  String values can
     optionally be enclosed in single or double quotes.  
 
-    @param recarray: Input numpy record array
-    @param filters: List of filters or string with one filter
-
-    @return: numpy boolean mask array of rows that match the filters.
+    :param recarray: Input numpy record array
+    :param filters: List of filters or string with one filter
+    :rtype: list of strings
     """
     re_filter_expr = re.compile(r'\s* (\w+) \s* ([<>=!]+) \s* (\S.*)', re.VERBOSE)
     
@@ -101,14 +104,15 @@ def match(recarray, filters):
     return matches
         
 def filter(recarray, filters):
-    """Apply the list of C{filters} to the numpy record array C{recarray} and
+    """
+    Apply the list of ``filters`` to the numpy record array ``recarray`` and
     return the filtered recarray.  See L{match} for description of the
     filter syntax.
 
-    @param recarray: Input numpy record array
-    @param filters: List of filters
+    :param recarray: Input numpy record array
+    :param filters: List of filters
 
-    @return: Filtered record array
+    :rtype: Filtered record array
     """
     if filters:
         return recarray[match(recarray, filters)]
@@ -116,16 +120,17 @@ def filter(recarray, filters):
         return recarray
 
 def interpolate(yin, xin, xout, method='linear'):
-    """Interpolate the curve defined by (xin, yin) at points xout.  The array
+    """
+    Interpolate the curve defined by (xin, yin) at points xout.  The array
     xin must be monotonically increasing.  The output has the same data type as
     the input yin.
 
-    @param yin: y values of input curve
-    @param xin: x values of input curve
-    @param xout: x values of output interpolated curve
-    @param method: interpolation method ('linear' | 'nearest')
+    :param yin: y values of input curve
+    :param xin: x values of input curve
+    :param xout: x values of output interpolated curve
+    :param method: interpolation method ('linear' | 'nearest')
 
-    @return: numpy array with interpolated curve
+    @:rtype: numpy array with interpolated curve
     """
     yout = numpy.empty(len(xout), dtype=yin.dtype)
     lenxin = len(xin)
@@ -147,7 +152,8 @@ def interpolate(yin, xin, xout, method='linear'):
         raise ValueError('Invalid interpolation method: %s' % method)
 
 def smooth(x,window_len=10,window='hanning'):
-    """Smooth the data using a window with requested size.
+    """
+    Smooth the data using a window with requested size.
     
     This method is based on the convolution of a scaled window with the signal.
     The signal is prepared by introducing reflected copies of the signal 
@@ -155,20 +161,22 @@ def smooth(x,window_len=10,window='hanning'):
     in the begining and end part of the output signal.
     
     Example::
+
       t = linspace(-2, 2, 50)
       y = sin(t) + randn(len(t)) * 0.1
       ys = Ska.Numpy.smooth(y)
       plot(t, y, t, ys)
     
     See also::
+
       numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
       scipy.signal.lfilter
 
-    @param x: input signal 
-    @param window_len: dimension of the smoothing window
-    @param window: type of window ('flat', 'hanning', 'hamming', 'bartlett', 'blackman')
+    :param x: input signal 
+    :param window_len: dimension of the smoothing window
+    :param window: type of window ('flat', 'hanning', 'hamming', 'bartlett', 'blackman')
 
-    @return: smoothed signal
+    :rtype: smoothed signal
     """
 
     if x.ndim != 1:
@@ -197,32 +205,38 @@ def smooth(x,window_len=10,window='hanning'):
     return y[window_len-1:-window_len+1]
 
 def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=None):
-    """Compress C{recarray} rows into intervals where adjacent rows are similar.
+    """
+    Compress ``recarray`` rows into intervals where adjacent rows are similar.
 
     In addition to the original column names, the output recarray will have
-    these columns::
-      <indexcol>_start: start value of the C{indexcol} column.  
-      <indexcol>_stop: stop value of the C{indexcol} column (inclusive
-                       up to the next interval).
-      samples: number of samples in interval
-    If C{indexcol} is None (default) then the table row index will be used and
+    these columns:
+
+      ``<indexcol>_start``
+         start value of the ``indexcol`` column.  
+      ``<indexcol>_stop``
+         stop value of the ``indexcol`` column (inclusive up to the next interval).
+      ``samples``
+         number of samples in interval
+
+    If ``indexcol`` is None (default) then the table row index will be used and
     the output columns will be row_start and row_stop.
 
-    C{delta} is a dict mapping column names to a delta value defining whether a
+    ``delta`` is a dict mapping column names to a delta value defining whether a
     column is sufficiently different to break the interval.  These are used
-    when generating the default C{diff} functions for numerical columns
+    when generating the default ``diff`` functions for numerical columns
     (i.e. those for which abs(x) succeeds).
 
-    C{diff} is a dict mapping column names to functions that take as input two
+    ``diff`` is a dict mapping column names to functions that take as input two
     values and return a boolean indicating whether the values are sufficiently
     different to break the interval.  Default diff functions will be generated
-    if C{diff} is None or for columns without an entry.
+    if ``diff`` is None or for columns without an entry.
 
-    C{avg} is a dict mapping column names to functions that calculate the
+    ``avg`` is a dict mapping column names to functions that calculate the
     average of a numpy array of values for that column.  Default avg functions
-    will be generated if C{avg} is None or for columns without an entry.
+    will be generated if ``avg`` is None or for columns without an entry.
 
     Example::
+
       a = ((1, 2, 'hello', 2.),
            (1, 4, 'hello', 3.),
            (1, 2, 'hello', 4.),
@@ -234,13 +248,13 @@ def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=
       arec = numpy.rec.fromrecords(a, names=('col1','col2','greet','time'))
       acomp = compress(arec, indexcol='time', delta={'col1':1.5})
 
-    @param delta: dict of delta thresholds defining when to break interval
-    @param indexcol: name of column to report start and stop values for interval.
-    @param diff: dict of functions defining the diff of 2 vals for that column name.
-    @param avg: dict of functions defining the average value for that column name.
-    @param colnames: list of column names to include (default = all).
+    :param delta: dict of delta thresholds defining when to break interval
+    :param indexcol: name of column to report start and stop values for interval.
+    :param diff: dict of functions defining the diff of 2 vals for that column name.
+    :param avg: dict of functions defining the average value for that column name.
+    :param colnames: list of column names to include (default = all).
 
-    @return: record array of compressed values
+    :rtype: record array of compressed values
     """
 
     def _numdiff(colname):
