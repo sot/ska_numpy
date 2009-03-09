@@ -3,6 +3,7 @@
 import numpy 
 import re
 import operator
+import sys
 
 __docformat__ = "restructuredtext en"
 
@@ -328,3 +329,56 @@ def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=
         indexcol = 'row'
     names = [indexcol+'_start', indexcol+'_stop', 'samples'] + colnames
     return numpy.rec.fromrecords(intervals, names=names)
+
+def pprint(recarray, fmt=None, out=sys.stdout):
+    """
+    Print a nicely-formatted version of ``recarray`` to ``out`` file-like object.
+    If ``fmt`` is provided it should be a dict of ``colname:fmt_spec`` pairs where
+    ``fmt_spec`` is a format specifier (e.g. '%5.2f').
+
+    :param recarray: input record array
+    :param fmt: dict of format specifiers (optional)
+    :param out: output file-like object
+
+    :rtype: None
+    """
+
+    # Define a dict of pretty-print functions for each column in fmt
+    if fmt is None:
+        pprint = {}
+    else:
+        pprint = dict((colname, lambda x: fmt[colname] % x) for colname in fmt)
+
+    colnames = recarray.dtype.names
+
+    # Pretty-print all columns and turn into another recarray made of strings
+    str_recarray = []
+    for row in recarray:
+        str_recarray.append([pprint.get(x, str)(row[x]) for x in colnames])
+    str_recarray = numpy.rec.fromrecords(str_recarray, names=colnames)
+
+    # Parse the descr fields of str_recarray recarray to get field width
+    colfmt = {}
+    for descr in str_recarray.dtype.descr:
+        colname, coldescr = descr
+        collen = max(int(re.search(r'\d+', coldescr).group()), len(colname))
+        colfmt[colname] = '%-' + str(collen) + 's'
+    
+    # Finally print everything to out
+    print >>out, ' '.join(colfmt[x] % x for x in colnames)
+    for row in str_recarray:
+        print >>out, ' '.join(colfmt[x] % row[x] for x in colnames)
+
+def pformat(recarray, fmt=None):
+    """Light wrapper around Ska.Numpy.pprint to return a string instead of
+    printing to a file.
+
+    :param recarray: input record array
+    :param fmt: dict of format specifiers (optional)
+
+    :rtype: string
+    """
+    import StringIO
+    out = StringIO.StringIO()
+    pprint(recarray, fmt, out)
+    return out.getvalue()
