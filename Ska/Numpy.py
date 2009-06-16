@@ -48,7 +48,9 @@ def match(recarray, filters):
 
     where ``colname`` is a column name in ``recarray``, ``op`` is an operator
     (e.g. == or < or >= etc), and ``value`` is a value.  String values can
-    optionally be enclosed in single or double quotes.  
+    optionally be enclosed in single or double quotes.
+
+    The pseudo-column name '_row_' can be used to filter on the row number.
 
     :param recarray: Input numpy record array
     :param filters: List of filters or string with one filter
@@ -82,23 +84,31 @@ def match(recarray, filters):
         if m:
             val = m.group(2)
 
-        if colname not in recarray.dtype.names:
+        # Set column values for comparison and convert string 'val' to correct
+        # type for the column.  Pseudo-column #row is the row number.
+        if colname in recarray.dtype.names:
+            colvals = recarray[colname]
+            val = recarray[colname].dtype.type(val)
+        elif colname == '_row_':
+            colvals = numpy.arange(len(recarray), dtype=int)
+            val = int(val)
+        else:
             raise ValueError('Column', colname, 'is not in', recarray.dtype.names)
 
-        # Convert string 'val' to correct numpy type for the column
-        val = recarray[colname].dtype.type(val)
-
         # Set up operator to do the comparison specified by the filtr expression
-        compare = { '>':  operator.gt,
-                    '>=': operator.ge,
-                    '!=': operator.ne,
-                    '==': operator.eq,
-                    '<':  operator.lt,
-                    '<=': operator.le }[op]
+        compare_ops = { '>':  operator.gt,
+                        '>=': operator.ge,
+                        '!=': operator.ne,
+                        '==': operator.eq,
+                        '<':  operator.lt,
+                        '<=': operator.le }
+        try:
+            compare = compare_ops[op]
+        except KeyError:
+            raise ValueError('Comparison operator "%s" in filter expression "%s" is not valid.' % (op, filtr))
 
         # And finally do the matching comparison
-        print colname, type(recarray[colname]), recarray[colname].dtype, val, type(val)
-        ok = compare(recarray[colname], val)
+        ok = compare(colvals, val)
         matches = matches & ok
 
     # return rows filtered by matches
@@ -196,7 +206,7 @@ def smooth(x,window_len=10,window='hanning'):
 
 
     s=numpy.r_[2*x[0]-x[window_len:1:-1],x,2*x[-1]-x[-1:-window_len:-1]]
-    #print(len(s))
+
     if window == 'flat': #moving average
         w=numpy.ones(window_len,'d')
     else:
