@@ -1,6 +1,6 @@
 """Provide useful utilities for numpy."""
 
-import numpy 
+import numpy as np
 import re
 import operator
 import sys
@@ -14,7 +14,7 @@ def add_column(recarray, name, val, index=None):
 
     :param recarray: Input record array
     :param name: Name of the new column
-    :param val: Value of the new column (numpy.array or list)
+    :param val: Value of the new column (np.array or list)
     :param index: Add column before index (default: append at end)
 
     :rtype: New record array with column appended
@@ -29,13 +29,13 @@ def add_column(recarray, name, val, index=None):
         index = len(recarray.dtype.names)
 
     if not hasattr(val, 'dtype'):
-        val = numpy.array(val)
+        val = np.array(val)
     valtype = val.dtype.str
 
     arrays.insert(index, val)
     dtypes.insert(index, (name, valtype))
 
-    return numpy.rec.fromarrays(arrays, dtype=dtypes)
+    return np.rec.fromarrays(arrays, dtype=dtypes)
 
 def match(recarray, filters):
     """
@@ -64,7 +64,7 @@ def match(recarray, filters):
     except TypeError:
         pass
 
-    matches = numpy.ones(len(recarray), dtype=numpy.bool)
+    matches = np.ones(len(recarray), dtype=np.bool)
 
     for filtr in filters:
         filtr = filtr.strip()           # No leading/trailing whitespace
@@ -90,7 +90,7 @@ def match(recarray, filters):
             colvals = recarray[colname]
             val = recarray[colname].dtype.type(val)
         elif colname == '_row_':
-            colvals = numpy.arange(len(recarray), dtype=int)
+            colvals = np.arange(len(recarray), dtype=int)
             val = int(val)
         else:
             raise ValueError('Column', colname, 'is not in', recarray.dtype.names)
@@ -143,10 +143,10 @@ def interpolate(yin, xin, xout, method='linear'):
 
     @:rtype: numpy array with interpolated curve
     """
-    yout = numpy.empty(len(xout), dtype=yin.dtype)
+    yout = np.empty(len(xout), dtype=yin.dtype)
     lenxin = len(xin)
 
-    i1 = numpy.searchsorted(xin, xout)
+    i1 = np.searchsorted(xin, xout)
     i1[ i1==0 ] = 1
     i1[ i1==lenxin ] = lenxin-1
 
@@ -158,11 +158,11 @@ def interpolate(yin, xin, xout, method='linear'):
     if method == 'linear':
         return (xout - x0) / (x1 - x0) * (y1 - y0) + y0
     elif method == 'nearest':
-        return numpy.where(numpy.abs(xout - x0) < numpy.abs(xout - x1), y0, y1)
+        return np.where(np.abs(xout - x0) < np.abs(xout - x1), y0, y1)
     else:
         raise ValueError('Invalid interpolation method: %s' % method)
 
-def smooth(x,window_len=10,window='hanning'):
+def smooth(x, window_len=10, window='hanning'):
     """
     Smooth the data using a window with requested size.
     
@@ -205,14 +205,14 @@ def smooth(x,window_len=10,window='hanning'):
         raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
 
 
-    s=numpy.r_[2*x[0]-x[window_len:1:-1],x,2*x[-1]-x[-1:-window_len:-1]]
+    s=np.r_[2*x[0]-x[window_len:1:-1],x,2*x[-1]-x[-1:-window_len:-1]]
 
     if window == 'flat': #moving average
-        w=numpy.ones(window_len,'d')
+        w = np.ones(window_len, 'd')
     else:
-        w=eval('numpy.'+window+'(window_len)')
+        w = getattr(np, window)(window_len)
 
-    y=numpy.convolve(w/w.sum(),s,mode='same')
+    y=np.convolve(w/w.sum(),s,mode='same')
     return y[window_len-1:-window_len+1]
 
 def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=None):
@@ -271,7 +271,7 @@ def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=
     def _numdiff(colname):
         d = delta.get(colname, 0)
         def _diff(x, y):
-            return (False if d is None else numpy.abs(x-y) > d)
+            return (False if d is None else np.abs(x-y) > d)
         return _diff
 
 
@@ -338,7 +338,7 @@ def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=
     if indexcol is None:
         indexcol = 'row'
     names = [indexcol+'_start', indexcol+'_stop', 'samples'] + colnames
-    return numpy.rec.fromrecords(intervals, names=names)
+    return np.rec.fromrecords(intervals, names=names)
 
 def pprint(recarray, fmt=None, out=sys.stdout):
     """
@@ -365,7 +365,7 @@ def pprint(recarray, fmt=None, out=sys.stdout):
     str_recarray = []
     for row in recarray:
         str_recarray.append([pprint.get(x, str)(row[x]) for x in colnames])
-    str_recarray = numpy.rec.fromrecords(str_recarray, names=colnames)
+    str_recarray = np.rec.fromrecords(str_recarray, names=colnames)
 
     # Parse the descr fields of str_recarray recarray to get field width
     colfmt = {}
@@ -392,3 +392,25 @@ def pformat(recarray, fmt=None):
     out = StringIO.StringIO()
     pprint(recarray, fmt, out)
     return out.getvalue()
+
+def structured_array(vals, colnames=None):
+    """Create a numpy structured array (ndarray) given a dict of numpy arrays.
+    The arrays can be multidimensional but must all have the same length (same
+    size of the first dimension). 
+
+    :param vals: dict of numpy ndarrays
+    :param colnames: column names (default=sorted vals keys)
+    """
+    if colnames is None:
+        colnames = sorted(vals.keys())
+        
+    lens = set(len(vals[x]) for x in colnames)
+    if len(lens) != 1:
+        raise ValueError('Inconsistent length of input arrays')
+
+    dtypes = [(x, vals[x].dtype, vals[x].shape[1:]) for x in colnames]
+    dat = np.ndarray(lens.pop(), dtype=dtypes)
+    for colname in colnames:
+        dat[colname] = vals[colname]
+
+    return dat

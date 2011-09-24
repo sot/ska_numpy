@@ -26,3 +26,11 @@ def test_filter_bad_colname():
 def test_filter_bad_syntax():
     a = Ska.Numpy.filter(ra, 'icol = 10')
     
+def test_structured_array():
+    vals = {'icol': ra['icol'].copy(),
+            'fcol': ra['fcol'].copy(),
+            'scol': ra['scol'].copy()}
+    names = ra.dtype.names
+    dat = Ska.Numpy.structured_array(vals)
+    assert dat.dtype.names == ('fcol', 'icol', 'scol')
+    assert np.all(dat['icol'] == ra['icol'])
