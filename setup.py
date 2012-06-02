@@ -1,10 +1,13 @@
 from setuptools import setup
+from Ska.Numpy.version import version
+
+
 setup(name='Ska.Numpy',
       author = 'Tom Aldcroft',
       description='Numpy utilities',
       author_email = 'taldcroft@cfa.harvard.edu',
       py_modules = ['Ska.Numpy'],
-      version='0.06',
+      version=version,
       zip_safe=False,
       namespace_packages=['Ska'],
       packages=['Ska', 'Ska/Numpy'],
