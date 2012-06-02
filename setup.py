@@ -7,7 +7,7 @@ setup(name='Ska.Numpy',
       version='0.06',
       zip_safe=False,
       namespace_packages=['Ska'],
-      packages=['Ska'],
-      package_dir={'Ska' : 'Ska'},
+      packages=['Ska', 'Ska/Numpy'],
+      package_dir={'Ska': 'Ska', 'Ska.Numpy': 'Ska/Numpy'},
       package_data={}
       )
