@@ -13,10 +13,9 @@ DTYPE = np.int
 ctypedef np.int_t DTYPE_t
 ctypedef np.double_t DTYPE_double_t
 
-# @cython.boundscheck(False) 
-def searchsorted2(np.ndarray[dtype=DTYPE_double_t, ndim=1] a not None,
-                  np.ndarray[dtype=DTYPE_double_t, ndim=1] v not None):
-# def searchsorted2(a, v):
+@cython.boundscheck(False) 
+def _search_both_sorted(np.ndarray[dtype=DTYPE_double_t, ndim=1] a not None,
+                       np.ndarray[dtype=DTYPE_double_t, ndim=1] v not None):
     """
     Find indices where elements should be inserted to maintain order.
 
@@ -30,16 +29,10 @@ def searchsorted2(np.ndarray[dtype=DTYPE_double_t, ndim=1] a not None,
         Input array, sorted in ascending order.
     v : array_like
         Values to insert into `a`.
-    side : {'left', 'right'}, optional
-        If 'left', the index of the first suitable location found is given.  If
-        'right', return the last such index.  If there is no suitable
-        index, return either 0 or N (where N is the length of `a`).
     """
     cdef int nv = v.shape[0]
     cdef np.ndarray[dtype=DTYPE_t, ndim=1] idx = np.empty(nv, dtype=DTYPE)
-    # idx = np.empty(len(v), dtype=DTYPE)
     cdef int na = a.shape[0]
-    # cdef DTYPE_t ia = 0
     cdef unsigned int ia = 0
     cdef unsigned int iv
     cdef double vi

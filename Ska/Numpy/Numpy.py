@@ -4,6 +4,10 @@ import numpy as np
 import re
 import operator
 import sys
+try:
+    from . import fastss
+except ImportError:
+    pass
 
 __docformat__ = "restructuredtext en"
 
@@ -414,3 +418,32 @@ def structured_array(vals, colnames=None):
         dat[colname] = vals[colname]
 
     return dat
+
+def search_both_sorted(a, v):
+    """Find indices where elements should be inserted to maintain order.
+
+    Find the indices into a sorted float array `a` such that, if the
+    corresponding elements in float array `v` were inserted before the indices,
+    the order of `a` would be preserved.
+
+    Similar to np.searchsorted but BOTH `a` and `v` must be sorted in ascending
+    order.  If `len(v) < len(a) / 100` then the normal `np.searchsorted` is
+    called.  Otherwise both `v` and `a` are cast to `np.float64` internally
+    and a Cython function is called to compute the indices in a fast way.
+
+    Parameters
+    ----------
+    :param a: input float array, sorted in ascending order
+    :param v: float values to insert into `a`, sorted in ascending order
+
+    :returns: indices as int np.array
+    """
+    # If `v` is not comparable in length to `a` then np.searchsorted is faster
+    if len(v) < len(a) / 100:
+        return np.searchsorted(a, v)
+    else:
+        # _search_both_sorted requires float64.  If already float64 this
+        # just returns a view of the original (taking no extra memory).
+        v = np.asarray(v, dtype=np.float64)
+        a = np.asarray(a, dtype=np.float64)
+        return fastss._search_both_sorted(a, v)
