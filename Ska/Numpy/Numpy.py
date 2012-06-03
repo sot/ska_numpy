@@ -134,7 +134,7 @@ def filter(recarray, filters):
     else:
         return recarray
 
-def interpolate(yin, xin, xout, method='linear'):
+def interpolate(yin, xin, xout, method='linear', sorted=False):
     """
     Interpolate the curve defined by (xin, yin) at points xout.  The array
     xin must be monotonically increasing.  The output has the same data type as
@@ -144,13 +144,18 @@ def interpolate(yin, xin, xout, method='linear'):
     :param xin: x values of input curve
     :param xout: x values of output interpolated curve
     :param method: interpolation method ('linear' | 'nearest')
+    :param sorted: `xout` values are sorted so use `search_both_sorted`
 
     @:rtype: numpy array with interpolated curve
     """
     yout = np.empty(len(xout), dtype=yin.dtype)
     lenxin = len(xin)
 
-    i1 = np.searchsorted(xin, xout)
+    if sorted:
+        i1 = search_both_sorted(xin, xout)
+    else:
+        i1 = np.searchsorted(xin, xout)
+
     i1[ i1==0 ] = 1
     i1[ i1==lenxin ] = lenxin-1
 
@@ -438,8 +443,9 @@ def search_both_sorted(a, v):
 
     :returns: indices as int np.array
     """
-    # If `v` is not comparable in length to `a` then np.searchsorted is faster
-    if len(v) < len(a) / 100:
+    # If `v` is not comparable in length to `a` then np.searchsorted is faster.
+    # Also require that both inputs be floating type.
+    if a.dtype.kind != 'f' or v.dtype.kind != 'f' or len(v) < len(a) / 100:
         return np.searchsorted(a, v)
     else:
         # _search_both_sorted requires float64.  If already float64 this
