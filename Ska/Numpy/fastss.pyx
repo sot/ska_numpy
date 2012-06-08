@@ -2,18 +2,13 @@ import numpy as np
 import cython
 cimport numpy as np
 
-# We now need to fix a datatype for our arrays. I've used the variable
-# DTYPE for this, which is assigned to the usual NumPy runtime
-# type info object.
 DTYPE = np.int
 
-# "ctypedef" assigns a corresponding compile-time type to DTYPE_t. For
-# every type in the numpy module there's a corresponding compile-time
-# type with a _t-suffix.
 ctypedef np.int_t DTYPE_t
 ctypedef np.double_t DTYPE_double_t
 
-@cython.boundscheck(False) 
+@cython.wraparound(False)
+@cython.boundscheck(False)
 def _search_both_sorted(np.ndarray[dtype=DTYPE_double_t, ndim=1] a not None,
                        np.ndarray[dtype=DTYPE_double_t, ndim=1] v not None):
     """
@@ -41,16 +36,13 @@ def _search_both_sorted(np.ndarray[dtype=DTYPE_double_t, ndim=1] a not None,
         vi = v[iv]
         while True:
             if ia < na:
-                if vi > a[ia]:
-                    ia += 1
-                else:
+                if vi <= a[ia]:
                     idx[iv] = ia
                     break
-            else:
-                if vi > a[na - 1]:
-                    idx[iv] = na
                 else:
-                    idx[iv] = na - 1
+                    ia += 1
+            else:
+                idx[iv] = na
                 break
 
     return idx
