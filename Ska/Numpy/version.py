@@ -1,4 +1,4 @@
-version = '0.07'
+version = '0.08'
 
 _versplit = version.replace('dev', '').split('.')
 major = int(_versplit[0])
