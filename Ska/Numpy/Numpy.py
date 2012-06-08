@@ -134,7 +134,8 @@ def filter(recarray, filters):
     else:
         return recarray
 
-def interpolate(yin, xin, xout, method='linear', sorted=False):
+
+def _interpolate_vectorized(yin, xin, xout, method='linear', sorted=False):
     """
     Interpolate the curve defined by (xin, yin) at points xout.  The array
     xin must be monotonically increasing.  The output has the same data type as
@@ -148,9 +149,8 @@ def interpolate(yin, xin, xout, method='linear', sorted=False):
 
     @:rtype: numpy array with interpolated curve
     """
-    yout = np.empty(len(xout), dtype=yin.dtype)
-    lenxin = len(xin)
 
+    lenxin = len(xin)
     if sorted:
         i1 = search_both_sorted(xin, xout)
     else:
@@ -165,11 +165,77 @@ def interpolate(yin, xin, xout, method='linear', sorted=False):
     y1 = yin[i1]
 
     if method == 'linear':
-        return (xout - x0) / (x1 - x0) * (y1 - y0) + y0
+        yout = (xout - x0) / (x1 - x0) * (y1 - y0) + y0
     elif method == 'nearest':
-        return np.where(np.abs(xout - x0) < np.abs(xout - x1), y0, y1)
+        yout = np.where(np.abs(xout - x0) < np.abs(xout - x1), y0, y1)
     else:
         raise ValueError('Invalid interpolation method: %s' % method)
+
+    return yout
+
+
+def _interpolate_cython(yin, xin, xout, method='linear', sorted=True):
+    """
+    Interpolate the curve defined by (xin, yin) at points xout.  Both arrays
+    xin and xout must be monotonically increasing.  The output has the same
+    data type as the input yin.
+
+    This uses the Cython version and is faster for len(xout) >~ len(xin) / 100.
+
+    :param yin: y values of input curve
+    :param xin: x values of input curve
+    :param xout: x values of output interpolated curve
+    :param method: interpolation method ('linear' | 'nearest')
+    :param sorted: `xout` values are sorted (must be True)
+
+    @:rtype: numpy array with interpolated curve
+    """
+
+    if not sorted:
+        raise ValueError('Input arrays must be sorted')
+
+    if xin.dtype.kind != 'f' or xout.dtype.kind != 'f':
+        raise ValueError('Input arrays must both be float type')
+
+    xin = np.asarray(xin, dtype=np.float64)
+    xout = np.asarray(xout, dtype=np.float64)
+
+    if method == 'nearest':
+        idxs = fastss._nearest_index(xin, xout)
+        return yin[idxs]
+    elif method == 'linear':
+        yin64 = np.asarray(yin, dtype=np.float64)
+        yout = fastss._interp_linear(yin64, xin, xout)
+        return np.asarray(yout, dtype=yin.dtype)
+    else:
+        raise ValueError('Invalid interpolation method: {}'.format(method))
+
+
+def interpolate(yin, xin, xout, method='linear', sorted=False, cython=True):
+    """
+    Interpolate the curve defined by (xin, yin) at points xout.  The array
+    xin must be monotonically increasing.  The output has the same data type as
+    the input yin.
+
+    :param yin: y values of input curve
+    :param xin: x values of input curve
+    :param xout: x values of output interpolated curve
+    :param method: interpolation method ('linear' | 'nearest')
+    :param sorted: `xout` values are sorted so use `search_both_sorted`
+    :param cython: use Cython interpolation code if possible (default=True)
+
+    @:rtype: numpy array with interpolated curve
+    """
+
+    if (cython and sorted and
+        xin.dtype.kind == 'f' and xout.dtype.kind == 'f'
+        and (yin.dtype.kind == 'f' or method == 'nearest')
+        and len(xout) >= len(xin) / 100):
+        func = _interpolate_cython
+    else:
+        func = _interpolate_vectorized
+
+    return func(yin, xin, xout, method=method, sorted=sorted)
 
 def smooth(x, window_len=10, window='hanning'):
     """

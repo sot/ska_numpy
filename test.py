@@ -68,11 +68,28 @@ def test_search_both_sorted():
     assert np.all(i_np == i_sbs)
 
 
-def test_interpolate_sorted():
-    xin = np.linspace(0.2, 1.1, 1000)
-    xout = np.sort(np.random.random(1000))
-    yin = xin ** 2
-    for method in ('nearest', 'linear'):
-        y0 = Ska.Numpy.interpolate(yin, xin, xout, method=method)
-        y1 = Ska.Numpy.interpolate(yin, xin, xout, method=method, sorted=True)
-        assert np.all(y0 == y1)
+def test_interpolate_sorted_cython():
+    """Verify that the new cython versions give the same answer as the
+    legacy (numpy vectorized) code.  This hits both interpolation
+    and implicitly search_sorted.
+    """
+    n = 1000
+    xin = np.sort(np.random.random(n))
+    xout = np.linspace(-0.2, 1.2, n)
+    for dtype in (np.float32, np.float64, np.int, 'S4'):
+        yin = np.asarray(np.random.random(n) + 0.5, dtype=dtype)
+        for method in ('nearest', 'linear'):
+            if dtype == 'S4' and method == 'linear':
+                continue
+            ys = []
+            for cython in (True, False):
+                for sorted_ in (True, False):
+                    y = Ska.Numpy.interpolate(yin, xin, xout, method=method,
+                                           sorted=sorted_, cython=cython)
+                    ys.append(y)
+
+            for yc in ys[1:]:
+                if yin.dtype.kind == 'f':
+                    assert np.allclose(ys[0], yc)
+                else:
+                    assert np.all(ys[0] == yc)
