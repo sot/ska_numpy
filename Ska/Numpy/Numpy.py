@@ -197,14 +197,16 @@ def _interpolate_cython(yin, xin, xout, method='linear', sorted=True):
     if xin.dtype.kind != 'f' or xout.dtype.kind != 'f':
         raise ValueError('Input arrays must both be float type')
 
+    xin = np.asarray(xin, dtype=np.float64)
+    xout = np.asarray(xout, dtype=np.float64)
+
     if method == 'nearest':
-        xin = np.asarray(xin, dtype=np.float64)
-        xout = np.asarray(xout, dtype=np.float64)
         idxs = fastss._nearest_index(xin, xout)
         return yin[idxs]
     elif method == 'linear':
-        return _interpolate_vectorized(yin, xin, xout, method=method,
-                                       sorted=sorted)
+        yin64 = np.asarray(yin, dtype=np.float64)
+        yout = fastss._interp_linear(yin64, xin, xout)
+        return np.asarray(yout, dtype=yin.dtype)
     else:
         raise ValueError('Invalid interpolation method: {}'.format(method))
 
@@ -227,6 +229,7 @@ def interpolate(yin, xin, xout, method='linear', sorted=False, cython=True):
 
     if (cython and sorted and
         xin.dtype.kind == 'f' and xout.dtype.kind == 'f'
+        and (yin.dtype.kind == 'f' or method == 'nearest')
         and len(xout) >= len(xin) / 100):
         func = _interpolate_cython
     else:
