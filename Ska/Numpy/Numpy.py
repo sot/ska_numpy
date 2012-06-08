@@ -148,7 +148,6 @@ def interpolate(yin, xin, xout, method='linear', sorted=False):
 
     @:rtype: numpy array with interpolated curve
     """
-    yout = np.empty(len(xout), dtype=yin.dtype)
     lenxin = len(xin)
 
     if sorted:
