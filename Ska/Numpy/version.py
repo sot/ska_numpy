@@ -1,4 +1,6 @@
-version = '0.8.1'
+from __future__ import print_function
+
+version = '0.8.2'
 
 _versplit = version.replace('dev', '').split('.')
 major = int(_versplit[0])
@@ -44,4 +46,4 @@ except OSError:
     pass
 
 if __name__ == '__main__':
-    print version
+    print(version)
