@@ -19,7 +19,6 @@ setup(name='Ska.Numpy',
       cmdclass=cmdclass,
       ext_modules=[fastss_ext],
       zip_safe=False,
-      namespace_packages=['Ska'],
       packages=['Ska', 'Ska/Numpy'],
       package_dir={'Ska': 'Ska', 'Ska.Numpy': 'Ska/Numpy'},
       package_data={}
