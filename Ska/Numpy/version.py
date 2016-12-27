@@ -37,7 +37,7 @@ def _get_git_devstr():
         return ''
     else:
         revs = stdout.split('\n')
-        return  '-r%s-%s' % (len(revs), revs[0][:7])
+        return '-r%s-%s' % (len(revs), revs[0][:7])
 
 try:
     if not release:
