@@ -2,7 +2,7 @@ from setuptools import setup, Extension
 
 import numpy as np
 from Cython.Build import cythonize
-from Ska.Numpy.version import version
+from Ska.Numpy import __version__
 
 fastss_ext = Extension("*",
                        ['Ska/Numpy/fastss.pyx'],
@@ -17,7 +17,7 @@ setup(name='Ska.Numpy',
       description='Numpy utilities',
       author_email='aldcroft@head.cfa.harvard.edu',
       py_modules=['Ska.Numpy'],
-      version=version,
+      version=__version__,
       ext_modules=cythonize([fastss_ext]),
       zip_safe=False,
       packages=['Ska', 'Ska.Numpy', 'Ska.Numpy.tests'],

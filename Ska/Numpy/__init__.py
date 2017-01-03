@@ -1,5 +1,6 @@
 from .Numpy import *
-from .version import version as __version__
+
+__version__ = '3.8.1'
 
 
 def test(*args, **kwargs):
