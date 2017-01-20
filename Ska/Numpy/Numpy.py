@@ -1,5 +1,7 @@
 """Provide useful utilities for numpy."""
 
+from __future__ import print_function, division
+
 import numpy as np
 import re
 import operator
@@ -230,7 +232,7 @@ def interpolate(yin, xin, xout, method='linear', sorted=False, cython=True):
     if (cython and sorted and
         xin.dtype.kind == 'f' and xout.dtype.kind == 'f'
         and (yin.dtype.kind == 'f' or method == 'nearest')
-        and len(xout) >= len(xin) / 100):
+        and len(xout) >= len(xin) // 100):
         func = _interpolate_cython
     else:
         func = _interpolate_vectorized
@@ -266,10 +268,10 @@ def smooth(x, window_len=10, window='hanning'):
     """
 
     if x.ndim != 1:
-        raise ValueError, "smooth only accepts 1 dimension arrays."
+        raise ValueError("smooth only accepts 1 dimension arrays.")
 
     if x.size < window_len:
-        raise ValueError, "Input vector needs to be bigger than window size."
+        raise ValueError("Input vector needs to be bigger than window size.")
 
 
     if window_len<3:
@@ -277,7 +279,7 @@ def smooth(x, window_len=10, window='hanning'):
 
 
     if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+        raise ValueError("Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
 
 
     s=np.r_[2*x[0]-x[window_len:1:-1],x,2*x[-1]-x[-1:-window_len:-1]]
@@ -448,11 +450,11 @@ def pprint(recarray, fmt=None, out=sys.stdout):
         colname, coldescr = descr
         collen = max(int(re.search(r'\d+', coldescr).group()), len(colname))
         colfmt[colname] = '%-' + str(collen) + 's'
-    
+
     # Finally print everything to out
-    print >>out, ' '.join(colfmt[x] % x for x in colnames)
+    print(' '.join(colfmt[x] % x for x in colnames), file=out)
     for row in str_recarray:
-        print >>out, ' '.join(colfmt[x] % row[x] for x in colnames)
+        print(' '.join(colfmt[x] % row[x] for x in colnames), file=out)
 
 def pformat(recarray, fmt=None):
     """Light wrapper around Ska.Numpy.pprint to return a string instead of
@@ -463,8 +465,8 @@ def pformat(recarray, fmt=None):
 
     :rtype: string
     """
-    import StringIO
-    out = StringIO.StringIO()
+    import six
+    out = six.StringIO()
     pprint(recarray, fmt, out)
     return out.getvalue()
 
@@ -511,7 +513,7 @@ def search_both_sorted(a, v):
     """
     # If `v` is not comparable in length to `a` then np.searchsorted is faster.
     # Also require that both inputs be floating type.
-    if a.dtype.kind != 'f' or v.dtype.kind != 'f' or len(v) < len(a) / 100:
+    if a.dtype.kind != 'f' or v.dtype.kind != 'f' or len(v) < len(a) // 100:
         return np.searchsorted(a, v)
     else:
         # _search_both_sorted requires float64.  If already float64 this

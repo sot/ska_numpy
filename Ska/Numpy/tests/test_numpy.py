@@ -1,7 +1,7 @@
 import nose.tools as nt
 import numpy as np
 import Ska.Numpy
-print Ska.Numpy.__file__
+print(Ska.Numpy.__file__)
 
 ra = np.rec.fromrecords(((1,   3.4, 's1'),
                          (-1,  4.3, 'hey'),
