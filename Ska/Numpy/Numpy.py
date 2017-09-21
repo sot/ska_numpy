@@ -1,3 +1,4 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Provide useful utilities for numpy."""
 
 from __future__ import print_function, division
