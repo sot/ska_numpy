@@ -4,7 +4,7 @@ from setuptools import setup, Extension
 import numpy as np
 from Cython.Build import cythonize
 
-fastss_ext = Extension("*",
+fastss_ext = Extension("Ska.Numpy.fastss",
                        ['Ska/Numpy/fastss.pyx'],
                        include_dirs=[np.get_include()])
 try:
