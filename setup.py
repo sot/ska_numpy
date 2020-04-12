@@ -1,12 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from setuptools import setup, Extension
 
-import numpy as np
-from Cython.Build import cythonize
+try:
+    from Cython.Build import cythonize
+    import numpy as np
+    fastss_ext = Extension("Ska.Numpy.fastss",
+                           ['Ska/Numpy/fastss.pyx'],
+                           include_dirs=[np.get_include()])
+except ImportError:
+    cythonize = lambda arg: None
+    fastss_ext = None
 
-fastss_ext = Extension("Ska.Numpy.fastss",
-                       ['Ska/Numpy/fastss.pyx'],
-                       include_dirs=[np.get_include()])
 try:
     from testr.setup_helper import cmdclass
 except ImportError:
