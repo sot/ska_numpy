@@ -1,12 +1,19 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+import sys
 from setuptools import setup, Extension
 
-import numpy as np
-from Cython.Build import cythonize
+# Special case here to allow `python setup.py --version` to run without
+# requiring cython and numpy to be installed.
+if '--version' in sys.argv[1:]:
+    cythonize = lambda arg: None
+    fastss_ext = None
+else:
+    from Cython.Build import cythonize
+    import numpy as np
+    fastss_ext = Extension("Ska.Numpy.fastss",
+                           ['Ska/Numpy/fastss.pyx'],
+                           include_dirs=[np.get_include()])
 
-fastss_ext = Extension("Ska.Numpy.fastss",
-                       ['Ska/Numpy/fastss.pyx'],
-                       include_dirs=[np.get_include()])
 try:
     from testr.setup_helper import cmdclass
 except ImportError:
