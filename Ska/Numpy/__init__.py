@@ -3,7 +3,7 @@ import ska_helpers
 
 from .Numpy import *
 
-__version__ = ska_helpers.get_version(__package__)
+__version__ = ska_helpers.get_version('Ska.Numpy')
 
 
 def test(*args, **kwargs):
