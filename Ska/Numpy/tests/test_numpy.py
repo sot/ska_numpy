@@ -44,8 +44,8 @@ def test_structured_array():
 
 
 def test_search_both_sorted():
-    a = np.linspace(1, 10, 1e6)
-    v = np.linspace(0, 11, 1e6)
+    a = np.linspace(1, 10, 1_000_000)
+    v = np.linspace(0, 11, 1_000_000)
     i_np = np.searchsorted(a, v)
     i_sbs = Ska.Numpy.search_both_sorted(a, v)
     assert np.all(i_np == i_sbs)
@@ -56,8 +56,8 @@ def test_search_both_sorted():
     i_sbs = Ska.Numpy.search_both_sorted(a, v)
     assert np.all(i_np == i_sbs)
 
-    a = np.linspace(1, 10, 1e6)
-    v = np.linspace(0, 11, 1e2)
+    a = np.linspace(1, 10, 1_000_000)
+    v = np.linspace(0, 11, 100)
     i_np = np.searchsorted(a, v)
     i_sbs = Ska.Numpy.search_both_sorted(a, v)
     assert np.all(i_np == i_sbs)
