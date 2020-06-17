@@ -1,8 +1,14 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import nose.tools as nt
+from pathlib import Path
+import pytest
 import numpy as np
 import Ska.Numpy
-print(Ska.Numpy.__file__)
+
+# Check that this test file is in the same package as the imported Ska.Numpy.
+# Due to subtleties with pytest test collection and native namespace pacakges,
+# running `pytest Ska/Numpy` in the git repo will end up getting the installed
+# Ska.Numpy not the local one.  Use `python setup.py test` instead.
+assert Path(__file__).parent.parent == Path(Ska.Numpy.__file__).parent
 
 ra = np.rec.fromrecords(((1,   3.4, 's1'),
                          (-1,  4.3, 'hey'),
@@ -23,14 +29,14 @@ def test_filter():
     assert b[0]['icol'] == -1
 
 
-@nt.raises(ValueError)
 def test_filter_bad_colname():
-    Ska.Numpy.filter(ra, 'badcol == 10')
+    with pytest.raises(ValueError):
+        Ska.Numpy.filter(ra, 'badcol == 10')
 
 
-@nt.raises(ValueError)
 def test_filter_bad_syntax():
-    Ska.Numpy.filter(ra, 'icol = 10')
+    with pytest.raises(ValueError):
+        Ska.Numpy.filter(ra, 'icol = 10')
 
 
 def test_structured_array():
