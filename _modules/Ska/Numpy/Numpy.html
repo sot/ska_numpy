@@ -1,0 +1,618 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ska.Numpy.Numpy &#8212; Ska.Numpy 3.8.5.dev17+g10a40f5 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script type="text/javascript" src="../../../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../../index.html"><span id="logotext1">Ska! </span><span id="logotext2">Ska</span><span id="logotext3">.Numpy</span></a>
+  <ul>
+    
+    <li><a class="home" title="Homepage" href="">
+        <span id="logotext1"></span><span id="logotext2"></span>
+    </a></li>
+    <li><a title="General Index" href="../../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../../index.html">Ska.Numpy 3.8.5.dev17+g10a40f5 documentation</a>
+	 &#187;
+      </li>
+      <li><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Ska.Numpy.Numpy</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under a 3-clause BSD style license - see LICENSE.rst</span>
+<span class="sd">&quot;&quot;&quot;Provide useful utilities for numpy.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">fastss</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="n">__docformat__</span> <span class="o">=</span> <span class="s2">&quot;restructuredtext en&quot;</span>
+
+<div class="viewcode-block" id="add_column"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.add_column">[docs]</a><span class="k">def</span> <span class="nf">add_column</span><span class="p">(</span><span class="n">recarray</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add a column ``name`` with value ``val`` to ``recarray`` and return a new</span>
+<span class="sd">    record array.</span>
+
+<span class="sd">    :param recarray: Input record array</span>
+<span class="sd">    :param name: Name of the new column</span>
+<span class="sd">    :param val: Value of the new column (np.array or list)</span>
+<span class="sd">    :param index: Add column before index (default: append at end)</span>
+
+<span class="sd">    :rtype: New record array with column appended</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">recarray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Length mismatch: recarray, val = (</span><span class="si">%d</span><span class="s1">, </span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">recarray</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+
+    <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">recarray</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">recarray</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="n">recarray</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">descr</span>
+    
+    <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">recarray</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">valtype</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">str</span>
+
+    <span class="n">arrays</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+    <span class="n">dtypes</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">valtype</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">rec</span><span class="o">.</span><span class="n">fromarrays</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="match"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.match">[docs]</a><span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">recarray</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply the list of ``filters`` to the numpy record array ``recarray`` and</span>
+<span class="sd">    return the corresponding boolean mask array.</span>
+<span class="sd">    </span>
+<span class="sd">    Each filter is a string with a simple boolean comparison of the form::</span>
+
+<span class="sd">      colname op value</span>
+
+<span class="sd">    where ``colname`` is a column name in ``recarray``, ``op`` is an operator</span>
+<span class="sd">    (e.g. == or &lt; or &gt;= etc), and ``value`` is a value.  String values can</span>
+<span class="sd">    optionally be enclosed in single or double quotes.</span>
+
+<span class="sd">    The pseudo-column name &#39;_row_&#39; can be used to filter on the row number.</span>
+
+<span class="sd">    :param recarray: Input numpy record array</span>
+<span class="sd">    :param filters: List of filters or string with one filter</span>
+<span class="sd">    :rtype: list of strings</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">re_filter_expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s* (\w+) \s* ([&lt;&gt;=!]+) \s* (\S.*)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+    
+    <span class="c1"># Convert filters input to a list if string was supplied</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="p">[</span><span class="n">filters</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">matches</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">recarray</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">filtr</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
+        <span class="n">filtr</span> <span class="o">=</span> <span class="n">filtr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>           <span class="c1"># No leading/trailing whitespace</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filtr</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Parse the filter expression</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re_filter_expr</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">filtr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">colname</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Filter expression &quot;</span><span class="si">%s</span><span class="s1">&quot; is not valid.&#39;</span> <span class="o">%</span> <span class="n">filtr</span><span class="p">)</span>
+        
+        <span class="c1"># Strip off up to one set of matched quotes.</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([</span><span class="se">\&#39;</span><span class="s1">&quot;])(.*)\1$&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Set column values for comparison and convert string &#39;val&#39; to correct</span>
+        <span class="c1"># type for the column.  Pseudo-column #row is the row number.</span>
+        <span class="k">if</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">recarray</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+            <span class="n">colvals</span> <span class="o">=</span> <span class="n">recarray</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">recarray</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">colname</span> <span class="o">==</span> <span class="s1">&#39;_row_&#39;</span><span class="p">:</span>
+            <span class="n">colvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">recarray</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Column&#39;</span><span class="p">,</span> <span class="n">colname</span><span class="p">,</span> <span class="s1">&#39;is not in&#39;</span><span class="p">,</span> <span class="n">recarray</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+
+        <span class="c1"># Set up operator to do the comparison specified by the filtr expression</span>
+        <span class="n">compare_ops</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>  <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span>
+                        <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">,</span>
+                        <span class="s1">&#39;!=&#39;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">,</span>
+                        <span class="s1">&#39;==&#39;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">,</span>
+                        <span class="s1">&#39;&lt;&#39;</span><span class="p">:</span>  <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span>
+                        <span class="s1">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span> <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">compare</span> <span class="o">=</span> <span class="n">compare_ops</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Comparison operator &quot;</span><span class="si">%s</span><span class="s1">&quot; in filter expression &quot;</span><span class="si">%s</span><span class="s1">&quot; is not valid.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">filtr</span><span class="p">))</span>
+
+        <span class="c1"># And finally do the matching comparison</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="n">compare</span><span class="p">(</span><span class="n">colvals</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">matches</span> <span class="o">&amp;</span> <span class="n">ok</span>
+
+    <span class="c1"># return rows filtered by matches</span>
+    <span class="k">return</span> <span class="n">matches</span></div>
+        
+<div class="viewcode-block" id="filter"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.filter">[docs]</a><span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">recarray</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply the list of ``filters`` to the numpy record array ``recarray`` and</span>
+<span class="sd">    return the filtered recarray.  See L{match} for description of the</span>
+<span class="sd">    filter syntax.</span>
+
+<span class="sd">    :param recarray: Input numpy record array</span>
+<span class="sd">    :param filters: List of filters</span>
+
+<span class="sd">    :rtype: Filtered record array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">filters</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">recarray</span><span class="p">[</span><span class="n">match</span><span class="p">(</span><span class="n">recarray</span><span class="p">,</span> <span class="n">filters</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">recarray</span></div>
+
+
+<span class="k">def</span> <span class="nf">_interpolate_vectorized</span><span class="p">(</span><span class="n">yin</span><span class="p">,</span> <span class="n">xin</span><span class="p">,</span> <span class="n">xout</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interpolate the curve defined by (xin, yin) at points xout.  The array</span>
+<span class="sd">    xin must be monotonically increasing.  The output has the same data type as</span>
+<span class="sd">    the input yin.</span>
+
+<span class="sd">    :param yin: y values of input curve</span>
+<span class="sd">    :param xin: x values of input curve</span>
+<span class="sd">    :param xout: x values of output interpolated curve</span>
+<span class="sd">    :param method: interpolation method (&#39;linear&#39; | &#39;nearest&#39;)</span>
+<span class="sd">    :param sorted: `xout` values are sorted so use `search_both_sorted`</span>
+
+<span class="sd">    @:rtype: numpy array with interpolated curve</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">lenxin</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xin</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">sorted</span><span class="p">:</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="n">search_both_sorted</span><span class="p">(</span><span class="n">xin</span><span class="p">,</span> <span class="n">xout</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">xin</span><span class="p">,</span> <span class="n">xout</span><span class="p">)</span>
+
+    <span class="n">i1</span><span class="p">[</span> <span class="n">i1</span><span class="o">==</span><span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">i1</span><span class="p">[</span> <span class="n">i1</span><span class="o">==</span><span class="n">lenxin</span> <span class="p">]</span> <span class="o">=</span> <span class="n">lenxin</span><span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">xin</span><span class="p">[</span><span class="n">i1</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">xin</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="n">yin</span><span class="p">[</span><span class="n">i1</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">yin</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="n">yout</span> <span class="o">=</span> <span class="p">(</span><span class="n">xout</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span> <span class="o">+</span> <span class="n">y0</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;nearest&#39;</span><span class="p">:</span>
+        <span class="n">yout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">xout</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">xout</span> <span class="o">-</span> <span class="n">x1</span><span class="p">),</span> <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid interpolation method: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">method</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">yout</span>
+
+
+<span class="k">def</span> <span class="nf">_interpolate_cython</span><span class="p">(</span><span class="n">yin</span><span class="p">,</span> <span class="n">xin</span><span class="p">,</span> <span class="n">xout</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interpolate the curve defined by (xin, yin) at points xout.  Both arrays</span>
+<span class="sd">    xin and xout must be monotonically increasing.  The output has the same</span>
+<span class="sd">    data type as the input yin.</span>
+
+<span class="sd">    This uses the Cython version and is faster for len(xout) &gt;~ len(xin) / 100.</span>
+
+<span class="sd">    :param yin: y values of input curve</span>
+<span class="sd">    :param xin: x values of input curve</span>
+<span class="sd">    :param xout: x values of output interpolated curve</span>
+<span class="sd">    :param method: interpolation method (&#39;linear&#39; | &#39;nearest&#39;)</span>
+<span class="sd">    :param sorted: `xout` values are sorted (must be True)</span>
+
+<span class="sd">    @:rtype: numpy array with interpolated curve</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">sorted</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input arrays must be sorted&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">xin</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s1">&#39;f&#39;</span> <span class="ow">or</span> <span class="n">xout</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input arrays must both be float type&#39;</span><span class="p">)</span>
+
+    <span class="n">xin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">xin</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">xout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">xout</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;nearest&#39;</span><span class="p">:</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="n">fastss</span><span class="o">.</span><span class="n">_nearest_index</span><span class="p">(</span><span class="n">xin</span><span class="p">,</span> <span class="n">xout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">yin</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="n">yin64</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">yin</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">yout</span> <span class="o">=</span> <span class="n">fastss</span><span class="o">.</span><span class="n">_interp_linear</span><span class="p">(</span><span class="n">yin64</span><span class="p">,</span> <span class="n">xin</span><span class="p">,</span> <span class="n">xout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">yout</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">yin</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid interpolation method: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="interpolate"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.interpolate">[docs]</a><span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="n">yin</span><span class="p">,</span> <span class="n">xin</span><span class="p">,</span> <span class="n">xout</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cython</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interpolate the curve defined by (xin, yin) at points xout.  The array</span>
+<span class="sd">    xin must be monotonically increasing.  The output has the same data type as</span>
+<span class="sd">    the input yin.</span>
+
+<span class="sd">    :param yin: y values of input curve</span>
+<span class="sd">    :param xin: x values of input curve</span>
+<span class="sd">    :param xout: x values of output interpolated curve</span>
+<span class="sd">    :param method: interpolation method (&#39;linear&#39; | &#39;nearest&#39;)</span>
+<span class="sd">    :param sorted: `xout` values are sorted so use `search_both_sorted`</span>
+<span class="sd">    :param cython: use Cython interpolation code if possible (default=True)</span>
+
+<span class="sd">    @:rtype: numpy array with interpolated curve</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">cython</span> <span class="ow">and</span> <span class="nb">sorted</span> <span class="ow">and</span>
+        <span class="n">xin</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span> <span class="ow">and</span> <span class="n">xout</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="n">yin</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span> <span class="ow">or</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">xout</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xin</span><span class="p">)</span> <span class="o">//</span> <span class="mi">100</span><span class="p">):</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">_interpolate_cython</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">_interpolate_vectorized</span>
+
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">yin</span><span class="p">,</span> <span class="n">xin</span><span class="p">,</span> <span class="n">xout</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="nb">sorted</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="smooth"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.smooth">[docs]</a><span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">window_len</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hanning&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Smooth the data using a window with requested size.</span>
+<span class="sd">    </span>
+<span class="sd">    This method is based on the convolution of a scaled window with the signal.</span>
+<span class="sd">    The signal is prepared by introducing reflected copies of the signal </span>
+<span class="sd">    (with the window size) in both ends so that transient parts are minimized</span>
+<span class="sd">    in the begining and end part of the output signal.</span>
+<span class="sd">    </span>
+<span class="sd">    Example::</span>
+
+<span class="sd">      t = linspace(-2, 2, 50)</span>
+<span class="sd">      y = sin(t) + randn(len(t)) * 0.1</span>
+<span class="sd">      ys = Ska.Numpy.smooth(y)</span>
+<span class="sd">      plot(t, y, t, ys)</span>
+<span class="sd">    </span>
+<span class="sd">    See also::</span>
+
+<span class="sd">      numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve</span>
+<span class="sd">      scipy.signal.lfilter</span>
+
+<span class="sd">    :param x: input signal </span>
+<span class="sd">    :param window_len: dimension of the smoothing window</span>
+<span class="sd">    :param window: type of window (&#39;flat&#39;, &#39;hanning&#39;, &#39;hamming&#39;, &#39;bartlett&#39;, &#39;blackman&#39;)</span>
+
+<span class="sd">    :rtype: smoothed signal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;smooth only accepts 1 dimension arrays.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="n">window_len</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input vector needs to be bigger than window size.&quot;</span><span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="n">window_len</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">window</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;flat&#39;</span><span class="p">,</span> <span class="s1">&#39;hanning&#39;</span><span class="p">,</span> <span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="s1">&#39;bartlett&#39;</span><span class="p">,</span> <span class="s1">&#39;blackman&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Window is on of &#39;flat&#39;, &#39;hanning&#39;, &#39;hamming&#39;, &#39;bartlett&#39;, &#39;blackman&#39;&quot;</span><span class="p">)</span>
+
+
+    <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="n">window_len</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">x</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="n">window_len</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+    <span class="k">if</span> <span class="n">window</span> <span class="o">==</span> <span class="s1">&#39;flat&#39;</span><span class="p">:</span> <span class="c1">#moving average</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">window_len</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">window</span><span class="p">)(</span><span class="n">window_len</span><span class="p">)</span>
+
+    <span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">w</span><span class="o">/</span><span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span><span class="n">s</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">y</span><span class="p">[</span><span class="n">window_len</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="n">window_len</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="compress"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.compress">[docs]</a><span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">recarray</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indexcol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">avg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colnames</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compress ``recarray`` rows into intervals where adjacent rows are similar.</span>
+
+<span class="sd">    In addition to the original column names, the output recarray will have</span>
+<span class="sd">    these columns:</span>
+
+<span class="sd">      ``&lt;indexcol&gt;_start``</span>
+<span class="sd">         start value of the ``indexcol`` column.  </span>
+<span class="sd">      ``&lt;indexcol&gt;_stop``</span>
+<span class="sd">         stop value of the ``indexcol`` column (inclusive up to the next interval).</span>
+<span class="sd">      ``samples``</span>
+<span class="sd">         number of samples in interval</span>
+
+<span class="sd">    If ``indexcol`` is None (default) then the table row index will be used and</span>
+<span class="sd">    the output columns will be row_start and row_stop.</span>
+
+<span class="sd">    ``delta`` is a dict mapping column names to a delta value defining whether a</span>
+<span class="sd">    column is sufficiently different to break the interval.  These are used</span>
+<span class="sd">    when generating the default ``diff`` functions for numerical columns</span>
+<span class="sd">    (i.e. those for which abs(x) succeeds).</span>
+
+<span class="sd">    ``diff`` is a dict mapping column names to functions that take as input two</span>
+<span class="sd">    values and return a boolean indicating whether the values are sufficiently</span>
+<span class="sd">    different to break the interval.  Default diff functions will be generated</span>
+<span class="sd">    if ``diff`` is None or for columns without an entry.</span>
+
+<span class="sd">    ``avg`` is a dict mapping column names to functions that calculate the</span>
+<span class="sd">    average of a numpy array of values for that column.  Default avg functions</span>
+<span class="sd">    will be generated if ``avg`` is None or for columns without an entry.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">      a = ((1, 2, &#39;hello&#39;, 2.),</span>
+<span class="sd">           (1, 4, &#39;hello&#39;, 3.),</span>
+<span class="sd">           (1, 2, &#39;hello&#39;, 4.),</span>
+<span class="sd">           (1, 2, &#39;hi there&#39;, 5.),</span>
+<span class="sd">           (1, 2, &#39;hello&#39;, 6.),</span>
+<span class="sd">           (3, 2, &#39;hello&#39;, 7.),</span>
+<span class="sd">           (1, 2, &#39;hello&#39;, 8.),</span>
+<span class="sd">           (2, 2, &#39;hello&#39;, 9.))</span>
+<span class="sd">      arec = numpy.rec.fromrecords(a, names=(&#39;col1&#39;,&#39;col2&#39;,&#39;greet&#39;,&#39;time&#39;))</span>
+<span class="sd">      acomp = compress(arec, indexcol=&#39;time&#39;, delta={&#39;col1&#39;:1.5})</span>
+
+<span class="sd">    :param delta: dict of delta thresholds defining when to break interval</span>
+<span class="sd">    :param indexcol: name of column to report start and stop values for interval.</span>
+<span class="sd">    :param diff: dict of functions defining the diff of 2 vals for that column name.</span>
+<span class="sd">    :param avg: dict of functions defining the average value for that column name.</span>
+<span class="sd">    :param colnames: list of column names to include (default = all).</span>
+
+<span class="sd">    :rtype: record array of compressed values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_numdiff</span><span class="p">(</span><span class="n">colname</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">delta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">colname</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">_diff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">False</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_diff</span>
+
+
+    <span class="k">if</span> <span class="n">delta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">delta</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">diff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">diff</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">avg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">avg</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">colnames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">colnames</span> <span class="o">=</span> <span class="n">recarray</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span>
+
+    <span class="n">i0</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">mins</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">maxs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">break_interval</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">end_of_data</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">intervals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">nrec</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">recarray</span><span class="p">)</span>
+
+    <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">indexcol</span><span class="p">]</span>
+
+    <span class="c1"># Set up the difference functions</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">recarray</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">colnames</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">diff</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">diff</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">_numdiff</span><span class="p">(</span><span class="n">colname</span><span class="p">)</span>
+            <span class="n">diff</span><span class="p">[</span><span class="n">colname</span><span class="p">](</span><span class="n">row</span><span class="p">[</span><span class="n">colname</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="n">colname</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">diff</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">y</span>
+
+    <span class="c1"># Set up averaging functions</span>
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">colnames</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">avg</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">avg</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">avg</span><span class="p">[</span><span class="n">colname</span><span class="p">](</span><span class="n">row</span><span class="p">[</span><span class="n">colname</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">avg</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nrec</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nrec</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">recarray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">:</span>
+                <span class="c1"># calc running min/max</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="n">mins</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">colname</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+                    <span class="n">mins</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="n">maxs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">colname</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+                    <span class="n">maxs</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+                <span class="k">if</span> <span class="n">diff</span><span class="p">[</span><span class="n">colname</span><span class="p">](</span><span class="n">mins</span><span class="p">[</span><span class="n">colname</span><span class="p">],</span> <span class="n">maxs</span><span class="p">[</span><span class="n">colname</span><span class="p">]):</span>
+                    <span class="n">break_interval</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">break_interval</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">break_interval</span><span class="p">:</span>
+            <span class="n">i1</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">avg</span><span class="p">[</span><span class="n">x</span><span class="p">](</span><span class="n">recarray</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">i0</span><span class="p">:</span><span class="n">i1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">)</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="p">(</span><span class="n">i1</span><span class="o">-</span><span class="n">i0</span><span class="p">,</span> <span class="p">)</span>
+            <span class="n">indexvals</span> <span class="o">=</span> <span class="p">(</span><span class="n">recarray</span><span class="p">[</span><span class="n">i0</span><span class="p">][</span><span class="n">indexcol</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="n">indexcol</span><span class="p">])</span> <span class="k">if</span> <span class="n">indexcol</span> <span class="k">else</span> <span class="p">(</span><span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">)</span> 
+            <span class="n">intervals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indexvals</span> <span class="o">+</span> <span class="n">samples</span> <span class="o">+</span> <span class="n">vals</span><span class="p">)</span>
+            <span class="n">i0</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">mins</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">)</span>
+            <span class="n">maxs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">)</span>
+            <span class="n">break_interval</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">indexcol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">indexcol</span> <span class="o">=</span> <span class="s1">&#39;row&#39;</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">indexcol</span><span class="o">+</span><span class="s1">&#39;_start&#39;</span><span class="p">,</span> <span class="n">indexcol</span><span class="o">+</span><span class="s1">&#39;_stop&#39;</span><span class="p">,</span> <span class="s1">&#39;samples&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">colnames</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">rec</span><span class="o">.</span><span class="n">fromrecords</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="pprint"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.pprint">[docs]</a><span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="n">recarray</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print a nicely-formatted version of ``recarray`` to ``out`` file-like object.</span>
+<span class="sd">    If ``fmt`` is provided it should be a dict of ``colname:fmt_spec`` pairs where</span>
+<span class="sd">    ``fmt_spec`` is a format specifier (e.g. &#39;%5.2f&#39;).</span>
+
+<span class="sd">    :param recarray: input record array</span>
+<span class="sd">    :param fmt: dict of format specifiers (optional)</span>
+<span class="sd">    :param out: output file-like object</span>
+
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Define a dict of pretty-print functions for each column in fmt</span>
+    <span class="k">if</span> <span class="n">fmt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pprint</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pprint</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">colname</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fmt</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">fmt</span><span class="p">)</span>
+
+    <span class="n">colnames</span> <span class="o">=</span> <span class="n">recarray</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span>
+
+    <span class="c1"># Pretty-print all columns and turn into another recarray made of strings</span>
+    <span class="n">str_recarray</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">recarray</span><span class="p">:</span>
+        <span class="n">str_recarray</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">pprint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)(</span><span class="n">row</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">])</span>
+    <span class="n">str_recarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rec</span><span class="o">.</span><span class="n">fromrecords</span><span class="p">(</span><span class="n">str_recarray</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">colnames</span><span class="p">)</span>
+
+    <span class="c1"># Parse the descr fields of str_recarray recarray to get field width</span>
+    <span class="n">colfmt</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">descr</span> <span class="ow">in</span> <span class="n">str_recarray</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">descr</span><span class="p">:</span>
+        <span class="n">colname</span><span class="p">,</span> <span class="n">coldescr</span> <span class="o">=</span> <span class="n">descr</span>
+        <span class="n">collen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="n">coldescr</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()),</span> <span class="nb">len</span><span class="p">(</span><span class="n">colname</span><span class="p">))</span>
+        <span class="n">colfmt</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;%-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">collen</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span>
+
+    <span class="c1"># Finally print everything to out</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">colfmt</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">%</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">str_recarray</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">colfmt</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">%</span> <span class="n">row</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="pformat"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.pformat">[docs]</a><span class="k">def</span> <span class="nf">pformat</span><span class="p">(</span><span class="n">recarray</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Light wrapper around Ska.Numpy.pprint to return a string instead of</span>
+<span class="sd">    printing to a file.</span>
+
+<span class="sd">    :param recarray: input record array</span>
+<span class="sd">    :param fmt: dict of format specifiers (optional)</span>
+
+<span class="sd">    :rtype: string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">six</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">pprint</span><span class="p">(</span><span class="n">recarray</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="structured_array"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.structured_array">[docs]</a><span class="k">def</span> <span class="nf">structured_array</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">colnames</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a numpy structured array (ndarray) given a dict of numpy arrays.</span>
+<span class="sd">    The arrays can be multidimensional but must all have the same length (same</span>
+<span class="sd">    size of the first dimension). </span>
+
+<span class="sd">    :param vals: dict of numpy ndarrays</span>
+<span class="sd">    :param colnames: column names (default=sorted vals keys)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">colnames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        
+    <span class="n">lens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lens</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent length of input arrays&#39;</span><span class="p">)</span>
+
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">]</span>
+    <span class="n">dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">lens</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">:</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">dat</span></div>
+
+<div class="viewcode-block" id="search_both_sorted"><a class="viewcode-back" href="../../../index.html#Ska.Numpy.Numpy.search_both_sorted">[docs]</a><span class="k">def</span> <span class="nf">search_both_sorted</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find indices where elements should be inserted to maintain order.</span>
+
+<span class="sd">    Find the indices into a sorted float array `a` such that, if the</span>
+<span class="sd">    corresponding elements in float array `v` were inserted before the indices,</span>
+<span class="sd">    the order of `a` would be preserved.</span>
+
+<span class="sd">    Similar to np.searchsorted but BOTH `a` and `v` must be sorted in ascending</span>
+<span class="sd">    order.  If `len(v) &lt; len(a) / 100` then the normal `np.searchsorted` is</span>
+<span class="sd">    called.  Otherwise both `v` and `a` are cast to `np.float64` internally</span>
+<span class="sd">    and a Cython function is called to compute the indices in a fast way.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    :param a: input float array, sorted in ascending order</span>
+<span class="sd">    :param v: float values to insert into `a`, sorted in ascending order</span>
+
+<span class="sd">    :returns: indices as int np.array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># If `v` is not comparable in length to `a` then np.searchsorted is faster.</span>
+    <span class="c1"># Also require that both inputs be floating type.</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s1">&#39;f&#39;</span> <span class="ow">or</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s1">&#39;f&#39;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">//</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># _search_both_sorted requires float64.  If already float64 this</span>
+        <span class="c1"># just returns a view of the original (taking no extra memory).</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fastss</span><span class="o">.</span><span class="n">_search_both_sorted</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+<form action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Tom Aldcroft.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.1.2. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>
