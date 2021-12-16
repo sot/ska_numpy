@@ -83,7 +83,7 @@ def test_interpolate_sorted_cython():
     n = 1000
     xin = np.sort(np.random.random(n))
     xout = np.linspace(-0.2, 1.2, n)
-    for dtype in (np.float32, np.float64, np.int, 'S4'):
+    for dtype in (np.float32, np.float64, np.int_, 'S4'):
         yin = np.asarray(np.random.random(n) + 0.5, dtype=dtype)
         for method in ('nearest', 'linear'):
             if dtype == 'S4' and method == 'linear':

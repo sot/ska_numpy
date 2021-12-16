@@ -71,7 +71,7 @@ def match(recarray, filters):
     except TypeError:
         pass
 
-    matches = np.ones(len(recarray), dtype=np.bool)
+    matches = np.ones(len(recarray), dtype=np.bool_)
 
     for filtr in filters:
         filtr = filtr.strip()           # No leading/trailing whitespace
