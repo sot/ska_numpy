@@ -2,7 +2,7 @@ import numpy as np
 import cython
 cimport numpy as np
 
-DTYPE = np.int_
+DTYPE = int
 
 ctypedef np.int_t DTYPE_t
 ctypedef np.double_t DTYPE_double_t
