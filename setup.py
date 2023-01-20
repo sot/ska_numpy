@@ -12,8 +12,8 @@ if '--version' in sys.argv[1:]:
 else:
     from Cython.Build import cythonize
     import numpy as np
-    fastss_ext = Extension("Ska.Numpy.fastss",
-                           ['Ska/Numpy/fastss.pyx'],
+    fastss_ext = Extension("ska_numpy.fastss",
+                           ['ska_numpy/fastss.pyx'],
                            include_dirs=[np.get_include()])
     ext_modules = cythonize([fastss_ext])
 
@@ -30,7 +30,6 @@ setup(name=name,
       author='Tom Aldcroft',
       description='Numpy utilities',
       author_email='taldcroft@cfa.harvard.edu',
-      py_modules=['Ska.Numpy'],
       use_scm_version=True,
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
       ext_modules=ext_modules,
