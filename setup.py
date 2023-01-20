@@ -2,33 +2,41 @@
 import sys
 from setuptools import setup, Extension
 
+from ska_helpers.setup_helper import duplicate_package_info
+from testr.setup_helper import cmdclass
+
 # Special case here to allow `python setup.py --version` to run without
 # requiring cython and numpy to be installed.
 if '--version' in sys.argv[1:]:
-    cythonize = lambda arg: None
-    fastss_ext = None
+    ext_modules = None
 else:
     from Cython.Build import cythonize
     import numpy as np
     fastss_ext = Extension("Ska.Numpy.fastss",
                            ['Ska/Numpy/fastss.pyx'],
                            include_dirs=[np.get_include()])
+    ext_modules = cythonize([fastss_ext])
 
-try:
-    from testr.setup_helper import cmdclass
-except ImportError:
-    cmdclass = {}
+name = "ska_numpy"
+namespace = "Ska.Numpy"
 
-setup(name='Ska.Numpy',
+packages = ["ska_numpy", "ska_numpy.tests"]
+package_dir = {name: name}
+
+duplicate_package_info(packages, name, namespace)
+duplicate_package_info(package_dir, name, namespace)
+
+setup(name=name,
       author='Tom Aldcroft',
       description='Numpy utilities',
-      author_email='aldcroft@head.cfa.harvard.edu',
+      author_email='taldcroft@cfa.harvard.edu',
       py_modules=['Ska.Numpy'],
       use_scm_version=True,
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
-      ext_modules=cythonize([fastss_ext]),
+      ext_modules=ext_modules,
       zip_safe=False,
-      packages=['Ska', 'Ska.Numpy', 'Ska.Numpy.tests'],
+      package_dir=package_dir,
+      packages=packages,
       tests_require=['pytest'],
       cmdclass=cmdclass,
       )
