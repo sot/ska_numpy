@@ -2,13 +2,13 @@
 from pathlib import Path
 import pytest
 import numpy as np
-import Ska.Numpy
+import ska_numpy
 
-# Check that this test file is in the same package as the imported Ska.Numpy.
+# Check that this test file is in the same package as the imported ska_numpy.
 # Due to subtleties with pytest test collection and native namespace pacakges,
 # running `pytest Ska/Numpy` in the git repo will end up getting the installed
-# Ska.Numpy not the local one.  Use `python setup.py test` instead.
-assert Path(__file__).parent.parent == Path(Ska.Numpy.__file__).parent
+# ska_numpy not the local one.  Use `python setup.py test` instead.
+assert Path(__file__).parent.parent == Path(ska_numpy.__file__).parent
 
 ra = np.rec.fromrecords(((1,   3.4, 's1'),
                          (-1,  4.3, 'hey'),
@@ -19,24 +19,24 @@ ra = np.rec.fromrecords(((1,   3.4, 's1'),
 
 
 def test_filter():
-    assert len(Ska.Numpy.filter(ra, 'icol > 80')) == 1
-    b = Ska.Numpy.filter(ra, '_row_ <= 2')
+    assert len(ska_numpy.filter(ra, 'icol > 80')) == 1
+    b = ska_numpy.filter(ra, '_row_ <= 2')
     assert len(b) == 3
     assert b[-1]['scol'] == 'there'
 
-    b = Ska.Numpy.filter(ra, ['scol < m', 'fcol < 5'])
+    b = ska_numpy.filter(ra, ['scol < m', 'fcol < 5'])
     assert len(b) == 1
     assert b[0]['icol'] == -1
 
 
 def test_filter_bad_colname():
     with pytest.raises(ValueError):
-        Ska.Numpy.filter(ra, 'badcol == 10')
+        ska_numpy.filter(ra, 'badcol == 10')
 
 
 def test_filter_bad_syntax():
     with pytest.raises(ValueError):
-        Ska.Numpy.filter(ra, 'icol = 10')
+        ska_numpy.filter(ra, 'icol = 10')
 
 
 def test_structured_array():
@@ -44,7 +44,7 @@ def test_structured_array():
             'fcol': ra['fcol'].copy(),
             'scol': ra['scol'].copy()}
     ra.dtype.names
-    dat = Ska.Numpy.structured_array(vals)
+    dat = ska_numpy.structured_array(vals)
     assert dat.dtype.names == ('fcol', 'icol', 'scol')
     assert np.all(dat['icol'] == ra['icol'])
 
@@ -53,25 +53,25 @@ def test_search_both_sorted():
     a = np.linspace(1, 10, 1_000_000)
     v = np.linspace(0, 11, 1_000_000)
     i_np = np.searchsorted(a, v)
-    i_sbs = Ska.Numpy.search_both_sorted(a, v)
+    i_sbs = ska_numpy.search_both_sorted(a, v)
     assert np.all(i_np == i_sbs)
 
     a = np.ones(100)
     v = np.ones(100)
     i_np = np.searchsorted(a, v)
-    i_sbs = Ska.Numpy.search_both_sorted(a, v)
+    i_sbs = ska_numpy.search_both_sorted(a, v)
     assert np.all(i_np == i_sbs)
 
     a = np.linspace(1, 10, 1_000_000)
     v = np.linspace(0, 11, 100)
     i_np = np.searchsorted(a, v)
-    i_sbs = Ska.Numpy.search_both_sorted(a, v)
+    i_sbs = ska_numpy.search_both_sorted(a, v)
     assert np.all(i_np == i_sbs)
 
     a = np.sort(np.random.random(100))
     v = np.sort(np.random.random(100))
     i_np = np.searchsorted(a, v)
-    i_sbs = Ska.Numpy.search_both_sorted(a, v)
+    i_sbs = ska_numpy.search_both_sorted(a, v)
     assert np.all(i_np == i_sbs)
 
 
@@ -91,7 +91,7 @@ def test_interpolate_sorted_cython():
             ys = []
             for cython in (True, False):
                 for sorted_ in (True, False):
-                    y = Ska.Numpy.interpolate(yin, xin, xout, method=method,
+                    y = ska_numpy.interpolate(yin, xin, xout, method=method,
                                            sorted=sorted_, cython=cython)
                     ys.append(y)
 
