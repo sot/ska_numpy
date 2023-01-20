@@ -15,7 +15,7 @@ else:
     fastss_ext = Extension("ska_numpy.fastss",
                            ['ska_numpy/fastss.pyx'],
                            include_dirs=[np.get_include()])
-    ext_modules = cythonize([fastss_ext])
+    ext_modules = cythonize([fastss_ext], language_level="3")
 
 name = "ska_numpy"
 namespace = "Ska.Numpy"

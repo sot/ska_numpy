@@ -1,14 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from pathlib import Path
 import pytest
 import numpy as np
-import ska_numpy
-
-# Check that this test file is in the same package as the imported ska_numpy.
-# Due to subtleties with pytest test collection and native namespace pacakges,
-# running `pytest Ska/Numpy` in the git repo will end up getting the installed
-# ska_numpy not the local one.  Use `python setup.py test` instead.
-assert Path(__file__).parent.parent == Path(ska_numpy.__file__).parent
+from .. import Numpy as ska_numpy
 
 ra = np.rec.fromrecords(((1,   3.4, 's1'),
                          (-1,  4.3, 'hey'),
