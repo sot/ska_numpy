@@ -31,7 +31,7 @@ def add_column(recarray, name, val, index=None):
 
     arrays = [recarray[x] for x in recarray.dtype.names]
     dtypes = recarray.dtype.descr
-    
+
     if index is None:
         index = len(recarray.dtype.names)
 
@@ -48,7 +48,7 @@ def match(recarray, filters):
     """
     Apply the list of ``filters`` to the numpy record array ``recarray`` and
     return the corresponding boolean mask array.
-    
+
     Each filter is a string with a simple boolean comparison of the form::
 
       colname op value
@@ -64,7 +64,7 @@ def match(recarray, filters):
     :rtype: list of strings
     """
     re_filter_expr = re.compile(r'\s* (\w+) \s* ([<>=!]+) \s* (\S.*)', re.VERBOSE)
-    
+
     # Convert filters input to a list if string was supplied
     try:
         filters = [filters + '']
@@ -85,7 +85,7 @@ def match(recarray, filters):
             colname, op, val = m.groups()
         else:
             raise ValueError('Filter expression "%s" is not valid.' % filtr)
-        
+
         # Strip off up to one set of matched quotes.
         m = re.match(r'([\'"])(.*)\1$', val)
         if m:
@@ -120,7 +120,7 @@ def match(recarray, filters):
 
     # return rows filtered by matches
     return matches
-        
+
 def filter(recarray, filters):
     """
     Apply the list of ``filters`` to the numpy record array ``recarray`` and
@@ -243,25 +243,25 @@ def interpolate(yin, xin, xout, method='linear', sorted=False, cython=True):
 def smooth(x, window_len=10, window='hanning'):
     """
     Smooth the data using a window with requested size.
-    
+
     This method is based on the convolution of a scaled window with the signal.
-    The signal is prepared by introducing reflected copies of the signal 
+    The signal is prepared by introducing reflected copies of the signal
     (with the window size) in both ends so that transient parts are minimized
     in the begining and end part of the output signal.
-    
+
     Example::
 
       t = linspace(-2, 2, 50)
       y = sin(t) + randn(len(t)) * 0.1
-      ys = Ska.Numpy.smooth(y)
+      ys = ska_numpy.smooth(y)
       plot(t, y, t, ys)
-    
+
     See also::
 
       numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
       scipy.signal.lfilter
 
-    :param x: input signal 
+    :param x: input signal
     :param window_len: dimension of the smoothing window
     :param window: type of window ('flat', 'hanning', 'hamming', 'bartlett', 'blackman')
 
@@ -301,7 +301,7 @@ def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=
     these columns:
 
       ``<indexcol>_start``
-         start value of the ``indexcol`` column.  
+         start value of the ``indexcol`` column.
       ``<indexcol>_stop``
          stop value of the ``indexcol`` column (inclusive up to the next interval).
       ``samples``
@@ -406,7 +406,7 @@ def compress(recarray, delta=None, indexcol=None, diff=None, avg=None, colnames=
             i1 = i
             vals = tuple(avg[x](recarray[x][i0:i1]) for x in colnames)
             samples = (i1-i0, )
-            indexvals = (recarray[i0][indexcol], row[indexcol]) if indexcol else (i0, i1) 
+            indexvals = (recarray[i0][indexcol], row[indexcol]) if indexcol else (i0, i1)
             intervals.append(indexvals + samples + vals)
             i0 = i
             mins = dict((x, row[x]) for x in colnames)
@@ -458,7 +458,7 @@ def pprint(recarray, fmt=None, out=sys.stdout):
         print(' '.join(colfmt[x] % row[x] for x in colnames), file=out)
 
 def pformat(recarray, fmt=None):
-    """Light wrapper around Ska.Numpy.pprint to return a string instead of
+    """Light wrapper around ska_numpy.pprint to return a string instead of
     printing to a file.
 
     :param recarray: input record array
@@ -474,14 +474,14 @@ def pformat(recarray, fmt=None):
 def structured_array(vals, colnames=None):
     """Create a numpy structured array (ndarray) given a dict of numpy arrays.
     The arrays can be multidimensional but must all have the same length (same
-    size of the first dimension). 
+    size of the first dimension).
 
     :param vals: dict of numpy ndarrays
     :param colnames: column names (default=sorted vals keys)
     """
     if colnames is None:
         colnames = sorted(vals.keys())
-        
+
     lens = set(len(vals[x]) for x in colnames)
     if len(lens) != 1:
         raise ValueError('Inconsistent length of input arrays')

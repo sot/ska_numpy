@@ -1,7 +1,7 @@
-:mod:`Ska.Numpy`
+:mod:`ska_numpy`
 =====================
 
-.. automodule:: Ska.Numpy.Numpy
+.. automodule:: ska_numpy.Numpy
    :members:
 
 
