@@ -4,16 +4,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ska.Numpy &#8212; Ska.Numpy 3.9.1 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>ska_numpy &#8212; ska_numpy 4.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-astropy.css" />
     
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <script type="text/javascript" src="_static/copybutton.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -22,7 +22,7 @@
 
   </head><body>
 <div class="topbar">
-  <a class="brand" title="Documentation Home" href="#"><span id="logotext1">Ska! </span><span id="logotext2">Ska</span><span id="logotext3">.Numpy</span></a>
+  <a class="brand" title="Documentation Home" href="#"><span id="logotext1">Ska! </span><span id="logotext2">ska_numpy</span><span id="logotext3"></span></a>
   <ul>
     
     <li><a class="home" title="Homepage" href="https://cxc.cfa.harvard.edu/mta/ASPECT/tool_doc">
@@ -47,7 +47,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="#">Ska.Numpy 3.9.1 documentation</a>
+	<a href="#">ska_numpy 4.0.0 documentation</a>
 	 &#187;
       </li>
       
@@ -61,12 +61,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-Ska.Numpy.Numpy">
-<span id="ska-numpy"></span><h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">Ska.Numpy</span></code><a class="headerlink" href="#module-Ska.Numpy.Numpy" title="Permalink to this headline">¶</a></h1>
+  <section id="module-ska_numpy.Numpy">
+<span id="ska-numpy"></span><h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">ska_numpy</span></code><a class="headerlink" href="#module-ska_numpy.Numpy" title="Permalink to this headline">¶</a></h1>
 <p>Provide useful utilities for numpy.</p>
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.add_column">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">add_column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recarray</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">val</span></em>, <em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#add_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.add_column" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.add_column">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">add_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#add_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.add_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a column <code class="docutils literal notranslate"><span class="pre">name</span></code> with value <code class="docutils literal notranslate"><span class="pre">val</span></code> to <code class="docutils literal notranslate"><span class="pre">recarray</span></code> and return a new
 record array.</p>
 <dl class="field-list simple">
@@ -85,8 +85,8 @@ record array.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.compress">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">compress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recarray</span></em>, <em class="sig-param"><span class="n">delta</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indexcol</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">diff</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">avg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colnames</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#compress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.compress" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.compress">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexcol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colnames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.compress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compress <code class="docutils literal notranslate"><span class="pre">recarray</span></code> rows into intervals where adjacent rows are similar.</p>
 <p>In addition to the original column names, the output recarray will have
 these columns:</p>
@@ -143,8 +143,8 @@ will be generated if <code class="docutils literal notranslate"><span class="pre
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.filter">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recarray</span></em>, <em class="sig-param"><span class="n">filters</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.filter" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.filter">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.filter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the list of <code class="docutils literal notranslate"><span class="pre">filters</span></code> to the numpy record array <code class="docutils literal notranslate"><span class="pre">recarray</span></code> and
 return the filtered recarray.  See L{match} for description of the
 filter syntax.</p>
@@ -162,8 +162,8 @@ filter syntax.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.interpolate">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">interpolate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yin</span></em>, <em class="sig-param"><span class="n">xin</span></em>, <em class="sig-param"><span class="n">xout</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="n">sorted</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">cython</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#interpolate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.interpolate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.interpolate">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cython</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.interpolate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interpolate the curve defined by (xin, yin) at points xout.  The array
 xin must be monotonically increasing.  The output has the same data type as
 the input yin.</p>
@@ -183,8 +183,8 @@ the input yin.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.match">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">match</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recarray</span></em>, <em class="sig-param"><span class="n">filters</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.match" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.match">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.match" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the list of <code class="docutils literal notranslate"><span class="pre">filters</span></code> to the numpy record array <code class="docutils literal notranslate"><span class="pre">recarray</span></code> and
 return the corresponding boolean mask array.</p>
 <p>Each filter is a string with a simple boolean comparison of the form:</p>
@@ -209,9 +209,9 @@ optionally be enclosed in single or double quotes.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.pformat">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">pformat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recarray</span></em>, <em class="sig-param"><span class="n">fmt</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#pformat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.pformat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Light wrapper around Ska.Numpy.pprint to return a string instead of
+<dt class="sig sig-object py" id="ska_numpy.Numpy.pformat">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">pformat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#pformat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.pformat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Light wrapper around ska_numpy.pprint to return a string instead of
 printing to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -227,8 +227,8 @@ printing to a file.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.pprint">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">pprint</code><span class="sig-paren">(</span><em class="sig-param">recarray</em>, <em class="sig-param">fmt=None</em>, <em class="sig-param">out=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='utf-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#pprint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.pprint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.pprint">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">pprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">recarray</span></em>, <em class="sig-param"><span class="pre">fmt=None</span></em>, <em class="sig-param"><span class="pre">out=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#pprint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.pprint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print a nicely-formatted version of <code class="docutils literal notranslate"><span class="pre">recarray</span></code> to <code class="docutils literal notranslate"><span class="pre">out</span></code> file-like object.
 If <code class="docutils literal notranslate"><span class="pre">fmt</span></code> is provided it should be a dict of <code class="docutils literal notranslate"><span class="pre">colname:fmt_spec</span></code> pairs where
 <code class="docutils literal notranslate"><span class="pre">fmt_spec</span></code> is a format specifier (e.g. ‘%5.2f’).</p>
@@ -247,8 +247,8 @@ If <code class="docutils literal notranslate"><span class="pre">fmt</span></code
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.search_both_sorted">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">search_both_sorted</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#search_both_sorted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.search_both_sorted" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.search_both_sorted">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">search_both_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#search_both_sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.search_both_sorted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find indices where elements should be inserted to maintain order.</p>
 <p>Find the indices into a sorted float array <cite>a</cite> such that, if the
 corresponding elements in float array <cite>v</cite> were inserted before the indices,
@@ -271,17 +271,17 @@ and a Cython function is called to compute the indices in a fast way.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.smooth">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">smooth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">window_len</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">'hanning'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#smooth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.smooth" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.smooth">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">smooth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hanning'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#smooth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.smooth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Smooth the data using a window with requested size.</p>
 <p>This method is based on the convolution of a scaled window with the signal.
-The signal is prepared by introducing reflected copies of the signal 
+The signal is prepared by introducing reflected copies of the signal
 (with the window size) in both ends so that transient parts are minimized
 in the begining and end part of the output signal.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="mf">0.1</span>
-<span class="n">ys</span> <span class="o">=</span> <span class="n">Ska</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">ska_numpy</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -305,8 +305,8 @@ in the begining and end part of the output signal.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="Ska.Numpy.Numpy.structured_array">
-<code class="sig-prename descclassname">Ska.Numpy.Numpy.</code><code class="sig-name descname">structured_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vals</span></em>, <em class="sig-param"><span class="n">colnames</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Ska/Numpy/Numpy.html#structured_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Ska.Numpy.Numpy.structured_array" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ska_numpy.Numpy.structured_array">
+<span class="sig-prename descclassname"><span class="pre">ska_numpy.Numpy.</span></span><span class="sig-name descname"><span class="pre">structured_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colnames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ska_numpy/Numpy.html#structured_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ska_numpy.Numpy.structured_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a numpy structured array (ndarray) given a dict of numpy arrays.
 The arrays can be multidimensional but must all have the same length (same
 size of the first dimension).</p>
@@ -320,7 +320,7 @@ size of the first dimension).</p>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
             <div class="clearer"></div>
@@ -330,7 +330,7 @@ size of the first dimension).</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
 <ul>
-<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Ska.Numpy</span></code></a></li>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ska_numpy</span></code></a></li>
 </ul>
 
 
@@ -357,7 +357,7 @@ size of the first dimension).</p>
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Tom Aldcroft.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.1.2. &nbsp;
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 4.2.0. &nbsp;
   </p>
 </footer>
   </body>
