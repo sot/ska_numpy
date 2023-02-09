@@ -7,10 +7,7 @@ import numpy as np
 import re
 import operator
 import sys
-try:
-    from . import fastss
-except ImportError:
-    pass
+from ska_numpy import fastss
 
 __docformat__ = "restructuredtext en"
 
