@@ -4,7 +4,7 @@ cimport numpy as np
 
 DTYPE = int
 
-ctypedef np.int_t DTYPE_t
+ctypedef np.int64_t DTYPE_t
 ctypedef np.double_t DTYPE_double_t
 
 @cython.wraparound(False)
